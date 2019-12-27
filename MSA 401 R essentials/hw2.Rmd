@@ -1,0 +1,152 @@
+---
+title: "hw2"
+author: "Fanfei Li"
+date: "11/13/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Question 1
+##(a)
+```{r }
+mat <- matrix(1:25, ncol=5) 
+mat
+n<-nrow(mat)
+myseq<-{}
+for (i in 1:n){
+    myseq<-c(myseq,mat[i,i])
+}
+print("main diagonal:")
+myseq
+
+```
+##(b)
+```{r }
+mat <- matrix(1:25, ncol=5) 
+mat
+n<-nrow(mat)
+myseq<-{}
+for (i in 1:n-1){
+    myseq<-c(myseq,mat[i+1,i])
+}
+print("first band below the main diagonal:")
+myseq
+
+```
+#Question 2
+##(a)
+```{r}
+mat <- matrix(0, 3, 4)
+vec <- rep(1:3, 4)
+mat + vec
+```
+R fills up the matrix with elments in the vector along the column. After it has filled up the first column from top to bottom, t moves on to the second column, until all the elements are inserted in the matrix.\\
+
+##(b)
+```{r}
+mat <- matrix(0, 3, 4)
+vec <- rep(1:3)
+mat + vec
+```
+R fills up the matrix with elments in the vector along the column. After the elments in the vector are used up,R starts to reuse the elements in the vector from the beginning, until the whole matrix is full.\\
+
+##(c)
+```{r}
+mat <- matrix(0, 3, 4)
+vec <- rep(1:3)
+mat<-mat + vec
+t(mat)
+```
+
+#Question 3
+For the n=5 case:
+```{r}
+mat <- matrix(0, 5, 5)
+vec <- rep(1:5)
+mat<-t(mat + vec)+vec
+mat
+```
+#Question 4
+##(a)
+```{r}
+i<-2
+j<-4
+identmat <- diag(5)
+permutemat<-identmat
+permutemat[ , c(i,j)] <-permutemat[ , c(j,i)]
+permutemat
+```
+##(b)
+```{r}
+i<-2
+j<-4
+identmat <- diag(5)
+permutemat<-identmat
+permutemat[ , c(i,j)] <-identmat[ , c(j,i)]
+mat <- matrix(1:25, ncol=5)
+mat1=mat%*%permutemat
+mat2=permutemat%*%mat
+mat1
+mat2
+```
+They produce two matrices whose ith column and jth column are switched.\\
+
+##Question 5
+```{r}
+Sigma = matrix(c(1,-0.8,-0.8,1),ncol=2)
+R = chol(Sigma)
+N = 100000 
+X = t(R)%*%matrix(rnorm(N),nrow=2)+c(10,5)
+X = t(X)
+plot(X)
+```
+
+##Question 6
+
+```{r}
+library(devtools)
+install_bitbucket("perossichi/DataAnalytics")
+```
+##(a)
+```{r}
+data(mvehicles, package="DataAnalytics")
+cars <- mvehicles[mvehicles$bodytype != "Truck", ]
+Ford<-cars[cars$make== "Ford", ]
+Ford
+```
+##(b)
+```{r}
+nrow(cars[cars$make== "Kia", ])
+```
+##(c)
+```{r}
+nrow(cars[cars$emv>100000, ])
+```
+##(d)
+```{r}
+mean(cars[cars$emv>75000 & cars$origin=="Europe", ]$sales)
+```
+##(e)
+```{r}
+library(stringr)
+nrow(cars[str_detect(cars$style, "4dr") == TRUE, ])
+```
+##(f)
+```{r}
+library(stringr)
+nrow(cars[str_detect(cars$style, "4dr") == TRUE & cars$bodytype== "Sedan", ])
+```
+#Question 7
+##(a)
+```{r}
+kids <- list(c("Golf"),c("Alpha","Bravo","Charlie") )
+names(kids) <- c("Wong", "Kim")
+kids
+```
+##(b)
+```{r}
+length(kids$`Kim`)
+```

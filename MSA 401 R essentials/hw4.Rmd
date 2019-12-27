@@ -1,0 +1,96 @@
+---
+title: "hw4"
+author: "Fanfei Li"
+date: "12/4/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Q1
+```{r}
+data(Vanguard, package="DataAnalytics")
+library(tidyr)
+library(data.table)
+library(lubridate)
+```
+```{r}
+stocks_wide = Vanguard %>% spread(ticker, mret)
+head(stocks_wide,n=20)
+```
+```{r}
+aggregate(Vanguard$mret,list(funds=Vanguard$ticker),mean)
+```
+#Q2
+```{r}
+load("example_Uber_driverdata.rda")
+week_table=read.table("week_table.txt",header=TRUE,as.is=TRUE)
+week_table$Begin_date=as.Date(week_table$Begin_date)
+week_table$End_date=as.Date(week_table$End_date)
+analysis_dataset2<-analysis_dataset
+```
+
+```{r}
+
+mydays<-seq(as.Date("2015-08-27"), as.Date("2016-05-09"), "days")
+mydays<-mydays[(weekdays(mydays)=="Friday")]
+
+mydays
+
+```
+```{r}
+fetch_wkhour=function(date,week_table){
+# given a date find the week and hour span in that week
+days_of_wk=c("Monday","Tuesday","Wednesday","Thursday",
+"Friday","Saturday","Sunday")
+week= week_table$weekMS[date >= week_table$Begin_date &
+date <= week_table$End_date]
+day=which(days_of_wk == weekdays(date))
+hour=(day-1)*24 + 1:24
+return(list(week=week,hour=hour))
+}
+
+week_range=range(week_table$weekMS); hour_range=c(1,168)
+friday_wkhr =
+data.table(week=rep(seq(from=week_range[1],to=week_range[2]),
+each=hour_range[2]-hour_range[1]+1),
+hour=rep(seq(from=hour_range[1],to=hour_range[2]),
+week_range[2]-week_range[1]+1))
+friday_wkhr[,friday:=FALSE]
+```
+```{r}
+for(i in 1:length(mydays)){
+out=fetch_wkhour(mydays[i],week_table)
+friday_wkhr$friday[friday_wkhr$week == out$week &
+friday_wkhr$hour %in% out$hour]=TRUE
+}
+setkey(friday_wkhr,week,hour)
+setkey(analysis_dataset,week,hour)
+analysis_dataset = analysis_dataset[friday_wkhr,nomatch=0]
+```
+```{r}
+setkey(analysis_dataset,friday)
+dim(analysis_dataset)
+analysis_dataset=analysis_dataset[.(FALSE),]
+dim(analysis_dataset)
+analysis_dataset[,friday := NULL]
+dim(analysis_dataset)
+analysis_dataset
+```
+#q3 
+```{r}
+load("eff_wage_city_week_hour_transformed.rda")
+setkey(analysis_dataset,d_seqid,modal_city_id,week,hour)
+setnames(eff_wage_city_week_hour,  
+         c("weekMS", "hourcodeMS"),
+         c("week", "hour"))
+ds<-merge(analysis_dataset2, eff_wage_city_week_hour, by=c("modal_city_id","week", "hour"))
+dim(ds)
+```
+
+
+

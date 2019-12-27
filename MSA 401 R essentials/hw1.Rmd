@@ -1,0 +1,97 @@
+---
+title: "hw1"
+author: "Fanfei Li"
+date: "11/7/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Question 1
+## (a)
+```{r}
+seq(-10,10)
+```
+## (b)
+```{r}
+(1:10)^2
+```
+## (c)
+```{r}
+q1<-seq(-10,10)
+q2<-(1:10)^2
+sum(q1)
+sum(q2)
+```
+
+## (d)
+```{r}
+cumsum(q1)
+cumsum(q2)
+```
+# Question 2 
+You can calculate the length of the vectors seperately and add them together, or you could append the vectors to be a long vector, and then calculate the length. For example for vec1 as (1,2,3,4) and vec2 as (5,8,11):
+```{r}
+vec1<-c(1,2,3,4)
+vec2<-c(5,8,11)
+length(vec1)+length(vec2)
+vec3<-c(vec1,vec2)
+length(vec3)
+```
+# Question 3
+## (a)
+```{r}
+Inf-Inf
+```
+## (b)
+NaN means not a number, and is when a numerical expression is not defined, often produced by numerical computation. Whereas NA means not available, when a value of any type is missing.
+
+
+## (c)
+the third line of code returns the index i, where the ith element of x divided by the ith element of y returns an infinite result.
+
+# Question 4
+## (a)
+```{r}
+length(colors())
+```
+## (b)
+```{r}
+length(colors()[nchar(colors())>8])
+```
+# Question 5
+
+```{r}
+vec5 <- c(2,4,3,1,0,3)
+indexname<-c(1:length(vec5))
+names(vec5)<-indexname
+strtoi(names(vec5[vec5==3]))
+```
+# Question 6
+## (a)
+```{r}
+library(lubridate)
+```
+```{r}
+
+mydays<-seq(as.Date("2016/1/1"), as.Date("2016/12/31"), "days")
+mydays<-mydays[(weekdays(mydays)=="Saturday")]
+mydays[mday(mydays)%%2==1]
+
+```
+## (b)
+```{r}
+birthday<-seq(as.Date("1950/11/25"), as.Date("2050/11/25"), "years")
+birthday<-birthday[(weekdays(birthday)=="Thursday")]
+birthday
+```
+## (c)
+```{r}
+firstday<-ymd("20181101")
+firstday+(1:12)*months(3)
+```
+
+

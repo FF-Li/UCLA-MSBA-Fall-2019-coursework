@@ -1,0 +1,215 @@
+---
+title: "hw3"
+author: "Fanfei Li"
+date: "11/24/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Q1
+```{r}
+slots<-read.table("slots.txt", header = FALSE, sep = "", dec = ".")
+names(slots) <- c("w1","w2","w3","prize	night")
+slots<-as.data.frame(slots)
+for (i in 1:3){
+  slots[,i]<-factor(slots[,i],levels=c(0,1,2,3,5,6,7),labels=c("0","B", "BB","BBB","DD","C","7"))
+}
+  
+head(slots,n=20)
+```
+# Q2
+```{r}
+data(beerprod, package="DataAnalytics")
+par(mfrow = c(1, 2))
+hist1<-hist(beerprod$b_prod, col="blue")
+rug(beerprod$b_prod,col="red",side=1)
+boxplot1<-boxplot(beerprod$b_prod,col="green")
+rug(beerprod$b_prod,col="red",side=2)
+```
+
+#Q3\\
+##(a1)
+```{r}
+library(ggplot2)
+diamonds
+ggplot(diamonds) + geom_point(aes(y=log(price),x=price))+labs(y="log of price")
+```
+
+##(a2)
+```{r}
+par(mfrow = c(1, 2))#not working
+hist(diamonds$price,breaks=100)
+hist(log(diamonds$price),breaks=100)
+#ggplot(diamonds, aes(x=price)) + geom_histogram(bins=100)
+#ggplot(diamonds, aes(x=log(price))) + geom_histogram(bins=100)
+```
+
+##(a3)
+```{r}
+diamonds
+par(mfrow = c(1, 2))#not working
+plot(diamonds$price,sqrt(diamonds$price))
+plot(diamonds$price,(diamonds$price)^2)
+#ggplot(diamonds) + geom_point(aes(y=sqrt(price),x=price)) 
+#ggplot(diamonds) + geom_point(aes(y=price^2,x=price)) 
+```
+
+##(a4)\\
+
+The transformations are impacting the distribution of the shape.  The log transformation has a strong effect on the distribution shape which reduces the right skewness, the square root transformation has a moderate effect on the distribution shape which also reduces the right skewness and is often used for small values. The square transformation has a moderate effect on the distribution shape which reduces the left skewness.
+
+##(b1)
+```{r}
+ggplot(diamonds) + geom_point(aes(y=log(price),x=carat))+labs(title="scatterplot of log(price) versus carat ")
+```
+
+##(b2)
+```{r}
+p<-ggplot(diamonds) + geom_point(aes(y=price,x=carat))+labs(title="scatterplot of price versus carat ")
+library(scales)
+p + scale_y_continuous(labels = dollar)
+```
+
+##(b3)\\
+
+The relationship between price and carat is almost linear.  If log(price) and carat are linearly related, then price and carat is exponentially related. When you increase the carat,the price increases much quicker than the increase of the carat(at an exponential speed).\\
+
+##(c1)
+```{r}
+diamonds2<-diamonds[diamonds["cut"]=="Very Good"|diamonds["cut"]=="Ideal",]
+diamonds2$cut<-factor(diamonds2$cut)
+plot(log(price)~carat,col=c("cornflowerblue","cadetblue2")[cut],data=diamonds2,pch=20)
+legend("bottom",c("Ideal","Very Good"),col=c("cornflowerblue","cadetblue2"),pch=20)
+#ggplot(diamonds2) + geom_point(aes(y=log(price),x=carat,color=factor(cut)))+labs(title="scatterplot of log(price) versus carat ")+ theme(legend.position = c(0.8, 0.2))
+```
+
+##(c3)\\
+
+The cut slightly affects the level of price(almost ignorable), it doesn't alter the relationship between price and carat.\\
+
+#Q4
+```{r}
+par(mfrow=c(2,2))
+names<-c("Convertible","Hatchback","SUV","Truck")
+data(mvehicles, package="DataAnalytics")
+for (i in names){
+plot(mvehicles$emv[mvehicles$bodytype==i],mvehicles$sales[mvehicles$bodytype==i],xlab="emv",ylab="sales",main=paste("sales versus emv for",i),pch = 19, col = alpha("lightsteelblue2",0.5))}
+```
+
+#Q5
+```{r}
+#this function turns RGB color scale into hexadecimal color scale with given opacity
+# p.rossi
+# created 10/2017
+#
+# inputs:
+# color - charcter string (e.g. "magenta")
+# alpha - intensity parameter (numeric in (0,1])
+# output:
+# hexidecimal color number for use in Base graphics
+#
+col.alpha <- function(color, alpha) {
+  #adding restrictions to make sure color is one of the built-in R colors and that alpha is in the range [0, 1]. 
+  if((color %in% colors())==FALSE){print("color is not one of the built-in R colors")}
+  else if ((alpha<0)|(alpha>1)){print("alpha is not in the range [0, 1]")}
+  else{code <- col2rgb(color)/256
+  # converting RGB color scale into hexadecimal color scale with given opacity
+rgb(code[1], code[2], code[3], alpha)}
+}
+col.alpha("rrrred",0.5)
+
+
+```
+
+#Q6\\
+
+##(a)\\
+
+This two lines puts every column that contains only numeric elements into a dataframe.
+```{r}
+#numeric = sapply(df, is.numeric)
+#dfn = df[, numeric, drop = FALSE]
+```
+
+##(b)
+```{r}
+myfun<-function (df, CONF = 0.95, rnd = 3) 
+{
+  pandterm = function(message) {
+    stop(message, call. = FALSE)
+  }
+  if (missing(df)) 
+    pandterm("Requires a dataframe,matrix, or vector as input")
+  if (!is.data.frame(df)) {
+    if (!is.matrix(df) & !is.vector(df)) {
+      pandterm("Input not a dataframe, matrix, or vector")
+    }
+    else {
+      if (!is.data.frame(df)) 
+        df = data.frame(df)
+    }
+  }
+  if (!is.numeric(CONF)) 
+    pandterm("Confidence must be numeric variable")
+  if (!(CONF < 1 & CONF > 0)) 
+    pandterm("Confidence must be in (0,1)")
+  numeric = sapply(df, is.numeric)
+  dfn = df[, numeric, drop = FALSE]
+  numNA = function(vec) {
+    sum(is.na(vec))
+  }
+  nmiss = sapply(dfn, numNA)
+  means = sapply(dfn, mean, na.rm = TRUE)
+  sds = sapply(dfn, sd, na.rm = TRUE)
+  medians = sapply(dfn, median, na.rm = TRUE)
+  N = dim(dfn)[1]
+  semeans = sds/sqrt(c(rep(N, length(sds))) - nmiss)
+  per25 = sapply(dfn, quantile, prob = c(0.25), na.rm = TRUE)
+  per75 = sapply(dfn, quantile, prob = c(0.75), na.rm = TRUE)
+  IQR = per75 - per25
+  Zstar = -qnorm((1 - CONF)/2)
+  cil = means - Zstar * semeans
+  ciu = means + Zstar * semeans
+  variance=sapply(dfn, var, na.rm = TRUE)
+  mat = cbind(means, medians, sds, IQR, semeans, cil, ciu, 
+              nmiss,variance)
+  mat = round(mat, digits = rnd)
+  confc = as.character(CONF * 100)
+  lab = paste(confc, "% CI", sep = "")
+  
+  colnames(mat) = c("Mean", "Median", "SD", "IQR", "SE Mean", 
+                    paste(lab, "-L", sep = ""), paste(lab, "-U", sep = ""), 
+                    "NMissing","Variance")
+  print(mat)
+  cat("Number of Observations = ", N, fill = TRUE)
+  invisible(mat)
+}
+x<-c(3,4,9,7,8,3)
+myfun(x)
+```
+
+#Q7
+```{r}
+fi <- function(x) {
+  for (i in 1:length(x)){
+  if (x[i]<0) {
+  x[i]<--x[i]
+
+  } else if(x[i]>=0&x[i]<3) {
+x[i]<-x[i]^2
+  }
+   else{
+x[i]<-2*x[i]+9
+  }
+  }
+  x}
+
+print(fi(c(-2,2,4)))
+```
+
